@@ -24,10 +24,7 @@ app.use('/api', routes);
 app.get('/api/profile', authMiddleware, (req: any, res) => {
   // Exemplo de log avançado dentro de uma rota, injetado pelo pino-http
   req.log.info({ user: req.user }, 'Acessando rota de perfil protegida');
-  res.json({
-    message: 'Esta é uma rota protegida.',
-    user: req.user,
-  });
+  res.json(req.user);
 });
 
 // --- Servir Arquivos Estáticos (Frontend) ---

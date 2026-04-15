@@ -14,5 +14,5 @@ export const loginComGoogle = (credential: string) => {
  * @returns A resposta da API com os dados do usuário.
  */
 export const buscarPerfil = () => {
-  return api.get('/api/perfil');
+  return api.get('/api/profile');
 };
