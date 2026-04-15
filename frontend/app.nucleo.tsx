@@ -1,37 +1,46 @@
 
 import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom'; // 1. Importe o Router
 import AppRoutes from './app.routes';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { AuthProvider } from './contexto/contexto.autenticacao';
+import { AuthProvider, useAuth } from './contexto/contexto.autenticacao';
 import { env } from './config/env';
 
-/**
- * O componente raiz da aplicação.
- *
- * Ele envolve toda a aplicação com os provedores de contexto necessários.
- */
+const AppContent: React.FC = () => {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        Carregando aplicaçāo...
+      </div>
+    );
+  }
+
+  return <AppRoutes />;
+};
+
 const App: React.FC = () => {
-  // Verifica se o ID do cliente Google está presente e não é o valor placeholder.
   const isGoogleAuthConfigured = env.googleClientId && !env.googleClientId.includes('SEU_GOOGLE_CLIENT_ID');
 
-  const AppContent = (
-    <AuthProvider>
-      <AppRoutes />
-    </AuthProvider>
+  // O AuthProvider agora está dentro do Router
+  const MainApp = (
+    <Router> 
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </Router>
   );
 
   if (isGoogleAuthConfigured) {
-    // Se a autenticação do Google estiver configurada, envolve a aplicação com o provider.
     return (
       <GoogleOAuthProvider clientId={env.googleClientId}>
-        {AppContent}
+        {MainApp}
       </GoogleOAuthProvider>
     );
   } else {
-    // Se não estiver configurado, exibe um aviso no console e carrega a aplicação
-    // sem o provider do Google. A funcionalidade de login será desabilitada na página de Login.
     console.warn("AVISO: A autenticação do Google não está configurada. Para habilitar, adicione VITE_GOOGLE_CLIENT_ID ao arquivo .env");
-    return AppContent;
+    return MainApp;
   }
 };
 

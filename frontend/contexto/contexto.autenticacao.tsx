@@ -1,17 +1,28 @@
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { env } from '../config/env'; // Importa a configuração de ambiente
-import log from '../logs/app.log'; // Importa a função de log
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { logger } from '../logs/app.log';
+import { loginComGoogle, buscarPerfil } from '../servicos/servico.autenticacao';
+import api from '../servicos/api';
+
+// 1. Tipagem forte para o usuário
+type User = {
+  id: string;
+  email: string;
+  name?: string;
+  picture?: string;
+};
 
 // Define a interface para o estado de autenticação
 interface AuthState {
   token: string | null;
-  user: any; // Pode ser substituído por uma interface de usuário mais específica
+  user: User | null;
+  loading: boolean;
   login: (credential: string) => Promise<void>;
   logout: () => void;
 }
 
-// Cria o contexto de autenticação com um valor padrão undefined
+// Cria o contexto de autenticação
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 // Hook customizado para usar o contexto de autenticação
@@ -23,63 +34,76 @@ export const useAuth = () => {
   return context;
 };
 
-// Componente Provedor que envolve a aplicação
+// Componente Provedor
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
-  const [user, setUser] = useState<any>(null); // Dados do usuário podem ser carregados do token/API
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true); // Começa true para verificar o token inicial
+  const navigate = useNavigate();
+
+  // Efeito para verificar o token e buscar o usuário ao carregar o app
+  useEffect(() => {
+    const carregarUsuario = async () => {
+      if (token) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        try {
+          const response = await buscarPerfil();
+          setUser(response.data.user);
+          logger.info('auth.session.restored', { userId: response.data.user.id });
+        } catch (error) {
+          logger.warn('auth.session.invalid_token');
+          // Se o token for inválido, limpa tudo
+          logout();
+        }
+      } 
+      setLoading(false);
+    };
+
+    carregarUsuario();
+  }, [token]); // Depende apenas do token
 
   // Função para realizar o login
   const login = async (credential: string) => {
-    await log('Tentativa de login');
+    setLoading(true);
+    logger.info('auth.login.attempt');
     try {
-      // Constrói a URL completa da API usando a variável de ambiente
-      const apiUrl = `${env.apiUrl}/api/auth/google`;
+      const response = await loginComGoogle(credential);
+      const { token: newToken } = response.data;
 
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ credential }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Falha na autenticação com o backend');
-      }
-
-      const { token: newToken } = await response.json();
       setToken(newToken);
       localStorage.setItem('token', newToken);
-      await log('Login bem-sucedido');
+      api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
 
-      // Opcional: decodificar o token para obter dados do usuário e armazená-los no estado
-      // const decodedUser = jwt_decode(newToken); // Usando uma biblioteca como jwt-decode
-      // setUser(decodedUser);
+      // O useEffect cuidará de buscar e setar o usuário
+      logger.info('auth.login.success', { hasToken: !!newToken });
 
-    } catch (error) {
-      console.error("Erro no processo de login:", error);
-      await log(`Erro no processo de login: ${error}`);
-      // Limpa o estado em caso de erro
+    } catch (error: any) {
+      // O erro já é logado pelo interceptor, aqui apenas limpamos o estado
+      logger.error('auth.login.error', { message: error.message });
       setToken(null);
-      localStorage.removeItem('token');
       setUser(null);
-      throw error; // Propaga o erro para o chamador lidar com a UI
+      localStorage.removeItem('token');
+      delete api.defaults.headers.common['Authorization'];
+      throw error; // Propaga para a UI poder reagir
+    } finally {
+      setLoading(false);
     }
   };
 
   // Função para realizar o logout
-  const logout = async () => {
-    await log('Usuário deslogado');
+  const logout = () => {
+    logger.info('auth.logout.success', { userId: user?.id });
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
-    // Redireciona para a página de login ou inicial
-    window.location.href = '/login';
+    delete api.defaults.headers.common['Authorization'];
+    navigate('/login'); // 4. Navegação via React Router
   };
 
   const value = {
     token,
     user,
+    loading,
     login,
     logout,
   };

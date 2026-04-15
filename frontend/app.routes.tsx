@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './paginas/Login';
 import CompletarPerfil from './paginas/CompletarPerfil';
 import Cursos from './paginas/Cursos';
@@ -27,31 +27,30 @@ const PaginaInicial = () => {
 
 const AppRoutes: React.FC = () => {
   return (
-    <Router>
-      <Routes>
-        {/* Rota pública para login */}
-        <Route path="/login" element={<Login />} />
+    // O <Router> foi removido daqui e movido para app.nucleo.tsx
+    <Routes>
+      {/* Rota pública para login */}
+      <Route path="/login" element={<Login />} />
 
-        {/* A rota raiz agora decide para onde redirecionar */}
-        <Route path="/" element={<PaginaInicial />} />
+      {/* A rota raiz agora decide para onde redirecionar */}
+      <Route path="/" element={<PaginaInicial />} />
 
-        {/* Rotas Protegidas */}
-        {/* Todas as rotas aninhadas aqui exigirão autenticação */}
-        <Route element={<RotaProtegida />}>
-          <Route path="/completar-perfil" element={<CompletarPerfil />} />
-          <Route path="/cursos" element={<Cursos />} />
-          <Route path="/curso/:id" element={<DetalhesCurso />} />
-          <Route path="/conteudo-curso/:id" element={<ConteudoCurso />} />
-          <Route path="/criar-proposta" element={<CriarProposta />} />
-          <Route path="/curso/:id/configuracoes" element={<ConfiguracoesCurso />} />
-          <Route path="/notificacoes" element={<Notificacoes />} />
-          <Route path="/meus-cursos" element={<MeusCursos />} />
-          <Route path="/meu-perfil" element={<MeuPerfil />} />
-          <Route path="/pesquisar-cursos" element={<PesquisaCursos />} />
-          <Route path="/configuracoes-app" element={<ConfiguracoesApp />} />
-        </Route>
-      </Routes>
-    </Router>
+      {/* Rotas Protegidas */}
+      {/* Todas as rotas aninhadas aqui exigirão autenticação */}
+      <Route element={<RotaProtegida />}>
+        <Route path="/completar-perfil" element={<CompletarPerfil />} />
+        <Route path="/cursos" element={<Cursos />} />
+        <Route path="/curso/:id" element={<DetalhesCurso />} />
+        <Route path="/conteudo-curso/:id" element={<ConteudoCurso />} />
+        <Route path="/criar-proposta" element={<CriarProposta />} />
+        <Route path="/curso/:id/configuracoes" element={<ConfiguracoesCurso />} />
+        <Route path="/notificacoes" element={<Notificacoes />} />
+        <Route path="/meus-cursos" element={<MeusCursos />} />
+        <Route path="/meu-perfil" element={<MeuPerfil />} />
+        <Route path="/pesquisar-cursos" element={<PesquisaCursos />} />
+        <Route path="/configuracoes-app" element={<ConfiguracoesApp />} />
+      </Route>
+    </Routes>
   );
 };
 

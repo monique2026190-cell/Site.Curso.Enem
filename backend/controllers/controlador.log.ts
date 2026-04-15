@@ -1,8 +1,10 @@
-
 import { Request, Response } from 'express';
 
 export const logMessage = (req: Request, res: Response) => {
-  const { message } = req.body;
-  console.log('Frontend Log:', message);
-  res.status(200).send('Log received');
+  const logPayload = req.body;
+
+  // O console.log no backend agora receberá o objeto de log completo
+  console.log('Log do Frontend:', logPayload);
+
+  res.status(200).send('Log recebido');
 };
