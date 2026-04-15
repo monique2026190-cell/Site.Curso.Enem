@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "start": "npm run build && ts-node backend/server.ts",
+    "start": "npm run build && npx ts-node backend/server.ts",
     "build": "vite build",
     "preview": "vite preview"
   },

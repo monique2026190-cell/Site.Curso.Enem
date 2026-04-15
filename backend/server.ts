@@ -1,18 +1,26 @@
-import express from 'express';
-import path from 'path';
+import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
-const __dirname = new URL('.', import.meta.url).pathname;
 
-// Sirva os arquivos estáticos da pasta 'dist'
-app.use(express.static(path.join(__dirname, '../dist')));
+// Correção do __dirname (ESSENCIAL)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Para qualquer outra rota, sirva o index.html
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist', 'index.html'));
+// Caminho correto da build
+const distPath = path.join(__dirname, "../dist");
+
+// Servir arquivos estáticos
+app.use(express.static(distPath));
+
+// SPA fallback
+app.get("*", (req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
 });
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
+
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Servidor rodando na porta ${PORT}`);
 });
