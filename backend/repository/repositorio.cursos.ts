@@ -1,6 +1,6 @@
-import pool from '../db/pool';
-import { buscarCursosQuery } from '../db/queries/cursos.queries';
-import { logger } from '../logs/logger';
+import pool from '../db/pool.js';
+import { buscarCursosQuery } from '../db/queries/cursos.queries.js';
+import { logger } from '../logs/logger.js';
 
 /**
  * Busca todos os cursos no banco de dados.
