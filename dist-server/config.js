@@ -14,6 +14,7 @@ export const appConfig = {
     databaseUrl: process.env.DATABASE_URL,
     stripeSecretKey: process.env.STRIPE_SECRET_KEY,
     stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+    frontendUrl: process.env.FRONTEND_URL,
 };
 // --- Validação de Variáveis Críticas ---
 // Garante que a aplicação não inicie sem as configurações essenciais.
@@ -27,5 +28,9 @@ if (!appConfig.stripeSecretKey) {
 }
 if (!appConfig.stripeWebhookSecret) {
     console.error("[App Config] ERRO: A variável de ambiente STRIPE_WEBHOOK_SECRET não foi definida.");
+    process.exit(1);
+}
+if (!appConfig.frontendUrl) {
+    console.error("[App Config] ERRO: A variável de ambiente FRONTEND_URL não foi definida.");
     process.exit(1);
 }

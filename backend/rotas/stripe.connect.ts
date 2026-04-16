@@ -2,14 +2,14 @@
 import express from 'express';
 import Stripe from 'stripe';
 import { appConfig } from '../config';
-import { verificarToken } from '../middleware/auth'; 
-import { pool } from '../db/db';
+import { authMiddleware } from '../middleware/middleware.autenticacao'; 
+import pool from '../db/pool';
 
 const router = express.Router();
 
 // Inicializa o cliente Stripe com a chave secreta
 const stripe = new Stripe(appConfig.stripeSecretKey!, {
-  apiVersion: '2024-04-10',
+  apiVersion: '2024-04-10' as any,
   typescript: true
 });
 
@@ -18,7 +18,7 @@ const stripe = new Stripe(appConfig.stripeSecretKey!, {
  * @desc    Cria uma conta Stripe Connect e gera um link de onboarding
  * @access  Privado
  */
-router.post('/account', verificarToken, async (req: any, res) => {
+router.post('/account', authMiddleware, async (req: any, res) => {
   const userId = req.usuario.id;
   const userEmail = req.usuario.email;
 
@@ -66,7 +66,7 @@ router.post('/account', verificarToken, async (req: any, res) => {
  * @desc    Verifica o status da conta Stripe de um usuário
  * @access  Privado
  */
-router.get('/account/status', verificarToken, async (req: any, res) => {
+router.get('/account/status', authMiddleware, async (req: any, res) => {
     const userId = req.usuario.id;
 
     try {
