@@ -23,7 +23,7 @@ const PesquisaCursos: React.FC = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <Cabecalho />
         <Container sx={{ mt: 10, mb: 8, flexGrow: 1 }}>
-          <Typography variant="h4" gutterBottom>
+          <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: 'bold' }}>
             Pesquisar Cursos
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>

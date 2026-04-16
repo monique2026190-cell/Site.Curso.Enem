@@ -29,7 +29,7 @@ const Notificacoes: React.FC = () => {
       <Cabecalho />
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <Container sx={{ mt: 10, mb: 8, flexGrow: 1 }}>
-          <Typography variant="h4" gutterBottom>Notificações</Typography>
+          <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: 'bold' }}>Notificações</Typography>
           {
             notificacoes.map((notificacao, index) => (
               <NotificacaoCard key={index} tipo={notificacao.tipo as any} mensagem={notificacao.mensagem} data={notificacao.data} lida={notificacao.lida} />

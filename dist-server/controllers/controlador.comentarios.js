@@ -1,4 +1,4 @@
-import { servicoComentarios } from '../services/servico.comentarios';
+import { servicoComentarios } from '../services/servico.comentarios.js';
 export const controladorComentarios = {
     async buscarComentariosPorCurso(req, res) {
         try {

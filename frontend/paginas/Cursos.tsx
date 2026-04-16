@@ -34,7 +34,7 @@ const Cursos: React.FC = () => {
       <Cabecalho />
       <Container component="main" sx={{ mt: 10, mb: 8 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography component="h1" variant="h4">
+          <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: 'bold' }}>
             Cursos Disponíveis
           </Typography>
           <IconButton color="primary" onClick={handleSearchClick}>

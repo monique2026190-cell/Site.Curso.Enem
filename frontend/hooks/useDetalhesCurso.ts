@@ -15,7 +15,7 @@ export const useDetalhesCurso = (id: string | undefined) => {
       try {
         setLoading(true);
         const response = await buscarCursoPorId(id);
-        const cursoData = response?.data?.curso ?? response?.data;
+        const cursoData = response?.data;
         setCurso(cursoData && typeof cursoData === 'object' ? cursoData : null);
       } catch (err: any) {
         setError(err);

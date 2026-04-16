@@ -89,14 +89,14 @@ const Aula: React.FC = () => {
             <IconButton edge="start" color="inherit" aria-label="voltar" onClick={() => navigate(-1)}>
               <ArrowBackIcon />
             </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: 'bold' }}>
               Aula {aulaId}
             </Typography>
           </Toolbar>
         </AppBar>
 
         <Container component="main" maxWidth="md" sx={{ flexGrow: 1, overflowY: 'auto', py: 3 }}>
-          <Typography variant="h4" sx={{ mb: 2 }}>Adicionar Conteúdo</Typography>
+          <Typography variant="h4" sx={{ mb: 2, fontWeight: 'bold' }}>Adicionar Conteúdo</Typography>
           <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary' }}>
             Adicione arquivos, vídeos e imagens para esta aula.
           </Typography>

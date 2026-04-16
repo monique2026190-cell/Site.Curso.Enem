@@ -7,5 +7,5 @@ const router = Router();
 router.use('/auth', authRoutes);
 router.use(logRoutes);
 router.use(courseRoutes);
-router.use('/cursos', commentRoutes);
+router.use(commentRoutes);
 export default router;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, Container, Button, CardMedia, CssBaseline, GlobalStyles, CircularProgress, TextField } from '@mui/material';
+import { Card, CardContent, Typography, Container, Button, CardMedia, CssBaseline, GlobalStyles, CircularProgress, TextField, Box } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Cabecalho from '../componentes/Cabecalho';
@@ -22,10 +22,11 @@ const darkTheme = createTheme({
 
 const DetalhesCurso: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const cursoId = parseInt(id || '0');
+  const cursoId = id ? parseInt(id, 10) : undefined;
+
   const { curso, loading, error } = useDetalhesCurso(id);
-  const { data: comentarios, isLoading: loadingComentarios } = useComentarios(cursoId);
-  const { mutate: criarComentario } = useCriarComentario(cursoId);
+  const { data: comentarios, isLoading: loadingComentarios } = useComentarios(cursoId, !!cursoId);
+  const { mutate: criarComentario } = useCriarComentario(cursoId, !!cursoId);
   const { user } = useAuth();
   const [novoComentario, setNovoComentario] = useState('');
 
@@ -34,22 +35,22 @@ const DetalhesCurso: React.FC = () => {
   };
 
   const handleCriarComentario = () => {
-    if (user && novoComentario.trim() !== '') {
+    if (user && novoComentario.trim() !== '' && cursoId) {
       criarComentario({ comentario: novoComentario, usuarioId: user.id });
       setNovoComentario('');
     }
   };
 
   if (loading) {
-    return <CircularProgress />;
+    return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><CircularProgress /></Box>;
   }
 
   if (error) {
-    return <Typography>Erro ao carregar o curso.</Typography>;
+    return <Typography sx={{ textAlign: 'center', mt: 4 }}>Erro ao carregar o curso.</Typography>;
   }
 
   if (!curso) {
-    return <Typography>Curso não encontrado.</Typography>;
+    return <Typography sx={{ textAlign: 'center', mt: 4 }}>Curso não encontrado.</Typography>;
   }
 
   return (
@@ -59,25 +60,27 @@ const DetalhesCurso: React.FC = () => {
       <Cabecalho />
       <Container component="main" sx={{ mt: 10 }}>
         <Card sx={{ bgcolor: 'background.paper' }}>
-          <CardMedia
-            component="img"
-            height="300"
-            image={curso.capa_curso}
-            alt={`Imagem do ${curso.nome}`}
-          />
+          {curso.capa_curso && (
+            <CardMedia
+              component="img"
+              height="300"
+              image={curso.capa_curso}
+              alt={`Imagem do ${curso.nome}`}
+            />
+          )}
           <CardContent>
             <Typography component="h1" variant="h4" sx={{ mb: 2 }}>
               {curso.nome}
             </Typography>
             <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
-              {curso.preco}
+              R$ {curso.preco?.toFixed(2)}
             </Typography>
             <Button variant="contained" color="primary" sx={{ mt: 3 }} onClick={handleComprar}>
               Comprar Agora
             </Button>
           </CardContent>
         </Card>
-        <DescricaoCursoCard descricao={curso.descricao} />
+        {curso.descricao && <DescricaoCursoCard descricao={curso.descricao} />}
         
         <div className="my-8">
           <Typography variant="h5" component="h2" sx={{ mb: 4 }}>

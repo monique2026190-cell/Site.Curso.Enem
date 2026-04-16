@@ -1,6 +1,8 @@
 import React from 'react';
-import { Container, Typography, Box, CssBaseline, GlobalStyles, Tabs, Tab } from '@mui/material';
+import { Container, Typography, Box, CssBaseline, GlobalStyles, Tabs, Tab, Fab } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import AddIcon from '@mui/icons-material/Add';
+import { useNavigate } from 'react-router-dom';
 import Footer from '../componentes/Footer';
 import MeusCursosCard from '../componentes/conteiner.meus.curso';
 import Cabecalho from '../componentes/Cabecalho';
@@ -47,12 +49,28 @@ const cursosPublicados = [
   },
 ];
 
+// Cursos criados (dados fictícios)
+const cursosCriados = [
+  {
+    id: 4,
+    nome: 'Curso de GraphQL',
+    progresso: 0, 
+    imagemUrl: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1374&q=80',
+  },
+];
+
 const MeusCursos: React.FC = () => {
   const [selectedTab, setSelectedTab] = React.useState(0);
+  const navigate = useNavigate();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedTab(newValue);
   };
+
+  const handleCreateClick = () => {
+    navigate('/criar-proposta');
+  };
+
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -69,6 +87,7 @@ const MeusCursos: React.FC = () => {
             <Tabs value={selectedTab} onChange={handleChange} aria-label="abas de cursos" variant="fullWidth">
               <Tab label="Comprados" />
               <Tab label="Publicados" />
+              <Tab label="Criados" />
             </Tabs>
           </Box>
 
@@ -100,7 +119,37 @@ const MeusCursos: React.FC = () => {
             </Box>
           )}
 
+          {selectedTab === 2 && (
+            <Box>
+              {/* Botão de criar só aparece na aba "Criados" */}
+              {cursosCriados.map(curso => (
+                <MeusCursosCard 
+                  key={curso.id} 
+                  id={curso.id} 
+                  nome={curso.nome} 
+                  progresso={curso.progresso}
+                  imagemUrl={curso.imagemUrl} 
+                />
+              ))}
+            </Box>
+          )}
+
         </Container>
+        {/* Botão de Ação Flutuante para Criar Curso */}
+        {selectedTab === 2 && (
+            <Fab 
+                color="primary" 
+                aria-label="add" 
+                sx={{ 
+                    position: 'fixed', 
+                    bottom: '70px', 
+                    right: '20px' 
+                }}
+                onClick={handleCreateClick} // Adiciona o evento de clique
+            >
+                <AddIcon />
+            </Fab>
+        )}
         <Footer />
       </Box>
     </ThemeProvider>

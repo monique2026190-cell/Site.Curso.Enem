@@ -1,4 +1,4 @@
-import { repositorioComentarios } from '../repository/repositorio.comentarios';
+import { repositorioComentarios } from '../repository/repositorio.comentarios.js';
 export const servicoComentarios = {
     async buscarComentariosPorCurso(cursoId) {
         return repositorioComentarios.buscarComentariosPorCurso(cursoId);

@@ -32,7 +32,7 @@ const CompletarPerfil: React.FC = () => {
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
               <Person />
             </Avatar>
-            <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
+            <Typography variant="h4" gutterBottom sx={{ mb: 4, fontWeight: 'bold' }}>
               Completar Perfil
             </Typography>
             <form onSubmit={handleSave} style={{ width: '100%' }}>
