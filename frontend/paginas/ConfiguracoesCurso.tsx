@@ -5,6 +5,7 @@ import {
   Container, List, ListItem, ListItemIcon, ListItemText, Switch, Button
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, Edit, Photo, AddCircleOutline, Sort, Public, MonetizationOn, Delete } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 
 // O mesmo tema escuro e sofisticado da página de cursos
 const darkTheme = createTheme({
@@ -71,6 +72,7 @@ const SettingsListItem: React.FC<{ icon: React.ReactElement; label: string; acti
 );
 
 export const ConfiguracoesCurso: React.FC = () => {
+    const navigate = useNavigate();
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -78,7 +80,7 @@ export const ConfiguracoesCurso: React.FC = () => {
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
         <AppBar position="static" sx={{ bgcolor: 'background.paper', boxShadow: 'none', borderBottom: '1px solid rgba(255, 255, 255, 0.12)' }}>
           <Toolbar>
-            <IconButton edge="start" color="inherit" aria-label="voltar">
+            <IconButton edge="start" color="inherit" aria-label="voltar" onClick={() => navigate(-1)}>
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
