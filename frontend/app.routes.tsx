@@ -11,8 +11,8 @@ import Notificacoes from './paginas/Notificacoes';
 import MeusCursos from './paginas/MeusCursos';
 import MeuPerfil from './paginas/MeuPerfil';
 import PesquisaCursos from './paginas/PesquisaCursos';
-import ConfiguracoesCurso from './paginas/ConfiguracoesCurso';
-import ConfiguracoesApp from './paginas/ConfiguracoesApp';
+import { ConfiguracoesCurso } from './paginas/ConfiguracoesCurso';
+import { ConfiguracoesApp } from './paginas/ConfiguracoesApp';
 import RotaProtegida from './routes/RotaProtegida'; // Importe o componente de rota protegida
 import { useAuth } from './contexto/contexto.autenticacao';
 

@@ -1,173 +1,100 @@
+
 import React from 'react';
-import {
-  Typography,
-  Container,
-  Box,
-  CssBaseline,
-  GlobalStyles,
-  Card,
-  CardContent,
-  Grid
-} from '@mui/material';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Edit, Book, Delete, BarChart, People } from '@mui/icons-material';
 
-const darkTheme = createTheme({
-  palette: {
-    mode: 'dark',
-    background: {
-      default: '#0f1115',
-      paper: '#1a1d24',
-    },
-    text: {
-      primary: '#ffffff',
-      secondary: '#9aa4af',
-    }
-  },
-});
+export const ConfiguracoesCurso: React.FC = () => {
 
-const cardStyle = {
-  height: '100%',
-  borderRadius: 3,
-  p: 2,
-  background: '#1a1d24',
-  transition: 'all 0.25s ease',
-  cursor: 'pointer',
-  border: '1px solid rgba(255,255,255,0.04)',
+  const renderSwitch = () => (
+    <label className="switch" onClick={(e) => e.stopPropagation()}>
+      <input type="checkbox" />
+      <span className="slider"></span>
+    </label>
+  );
 
-  '&:hover': {
-    transform: 'translateY(-4px)',
-    border: '1px solid rgba(255,255,255,0.08)',
-    boxShadow: '0 10px 30px rgba(0,0,0,0.4)',
-  }
-};
+  const Item = ({ icon, label, rightElement }: any) => (
+    <div className="setting-item">
+      <div className="setting-info">
+        <i className={`fas ${icon}`}></i>
+        <p>{label}</p>
+      </div>
+      {rightElement}
+    </div>
+  );
 
-const ConfiguracoesCurso: React.FC = () => {
   return (
-    <ThemeProvider theme={darkTheme}>
-      <CssBaseline />
-      <GlobalStyles styles={{ body: { backgroundColor: '#0f1115' } }} />
+    <div className="h-screen bg-[radial-gradient(circle_at_top_left,_#0c0f14,_#0a0c10)] text-white font-['Inter'] flex flex-col overflow-hidden">
+      
+      <style>{`
+        header{display:flex;align-items:center;padding:16px;background:#0c0f14;position:fixed;width:100%;top:0;z-index:10;border-bottom:1px solid rgba(255,255,255,0.1);height:65px;}
+        header .back-btn{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;padding-right:15px;}
+        main{padding-top:85px;padding-bottom:100px;width:100%;max-width:600px;margin:0 auto;padding-left:20px;padding-right:20px;overflow-y:auto;flex-grow:1;}
+        .settings-group{margin-bottom:20px;}
+        .settings-group h2{font-size:13px;color:#8A2BE2;padding:10px 0;margin-bottom:8px;text-transform:uppercase;font-weight:800;letter-spacing:1px;}
+        .setting-item{display:flex;align-items:center;justify-content:space-between;padding:16px;background-color:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);transition:0.2s;color:#fff;cursor:pointer;border-radius:14px;margin-bottom:8px;}
+        .setting-item:hover{background-color:rgba(255,255,255,0.06);border-color:rgba(138,43,226,0.2);}
+        .setting-info{display:flex;align-items:center;}
+        .setting-info i{font-size:18px;width:30px;text-align:center;margin-right:12px;color:#8A2BE2;}
+        .setting-item p{font-size:15px;font-weight:500;}
+        .switch{position:relative;display:inline-block;width:44px;height:24px;}
+        .switch input{opacity:0;width:0;height:0;}
+        .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#333;transition:.4s;border-radius:25px;}
+        .slider:before{position:absolute;content:"";height:18px;width:18px;left:3px;bottom:3px;background-color:white;transition:.4s;border-radius:50%;}
+        input:checked + .slider{background-color:#8A2BE2;}
+        input:checked + .slider:before{transform:translateX(20px);}
+        .delete-container{margin-top:30px;padding:0 10px 40px 10px;}
+        .delete-btn{width:100%;padding:16px;background:rgba(255,77,77,0.08);border:1px solid rgba(255,77,77,0.2);color:#ff4d4d;border-radius:16px;font-weight:700;font-size:15px;cursor:pointer;transition:0.3s;display:flex;align-items:center;justify-content:center;gap:10px;}
+        .delete-btn:hover{background:#ff4d4d;color:#fff;box-shadow:0 4px 20px rgba(255,77,77,0.2);}
+      `}</style>
 
-      <Container maxWidth="md" sx={{ mt: 6 }}>
-        
-        <Box sx={{ mb: 5 }}>
-          <Typography variant="h4" sx={{ fontWeight: 600 }}>
-            Configurações do Curso
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-            Gerencie as informações e o conteúdo do seu curso
-          </Typography>
-        </Box>
+      <header>
+        <button className="back-btn">
+          <i className="fas fa-arrow-left"></i>
+        </button>
+        <h1 className="font-bold text-lg">Configurações do Curso</h1>
+      </header>
 
-        {/* Seção: Geral */}
-        <Box sx={{ mb: 4 }}>
-          <Typography sx={{ mb: 2, fontSize: 14, color: 'text.secondary' }}>
-            GERAL
-          </Typography>
+      <main>
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Card sx={cardStyle}>
-                <CardContent sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                  <Edit sx={{ color: '#60a5fa' }} />
-                  <Box>
-                    <Typography sx={{ fontWeight: 500 }}>
-                      Editar Informações
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Altere o título, a descrição e a capa
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
+        {/* GERAL */}
+        <div className="settings-group">
+          <h2>Geral</h2>
 
-            <Grid item xs={12} sm={6}>
-              <Card sx={cardStyle}>
-                <CardContent sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                  <People sx={{ color: '#34d399' }} />
-                  <Box>
-                    <Typography sx={{ fontWeight: 500 }}>
-                      Gerenciar Alunos
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Visualize e administre os participantes
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </Box>
+          <Item icon="fa-edit" label="Editar Título e Descrição" />
+          <Item icon="fa-image" label="Alterar Imagem de Capa" />
+        </div>
 
-        {/* Seção: Conteúdo */}
-        <Box sx={{ mb: 4 }}>
-          <Typography sx={{ mb: 2, fontSize: 14, color: 'text.secondary' }}>
-            CONTEÚDO
-          </Typography>
+        {/* CONTEÚDO */}
+        <div className="settings-group">
+          <h2>Conteúdo</h2>
 
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Card sx={cardStyle}>
-                <CardContent sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                  <Book sx={{ color: '#a78bfa' }} />
-                  <Box>
-                    <Typography sx={{ fontWeight: 500 }}>
-                      Estrutura do Curso
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Adicione ou remova módulos e aulas
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Card sx={cardStyle}>
-                <CardContent sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                  <BarChart sx={{ color: '#f59e0b' }} />
-                  <Box>
-                    <Typography sx={{ fontWeight: 500 }}>
-                      Análises e Relatórios
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Acompanhe o engajamento e o progresso
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </Box>
+          <Item icon="fa-plus-circle" label="Adicionar Novo Módulo" />
+          <Item icon="fa-sort" label="Reordenar Módulos" />
+        </div>
 
-        {/* Seção: Avançado */}
-        <Box>
-          <Typography sx={{ mb: 2, fontSize: 14, color: 'text.secondary' }}>
-            AVANÇADO
-          </Typography>
+        {/* ACESSO E PUBLICAÇÃO */}
+        <div className="settings-group">
+          <h2>Acesso e Publicação</h2>
 
-          <Grid container spacing={1}>
-            <Grid item xs={12} sm={6}>
-              <Card sx={cardStyle}>
-                <CardContent sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                  <Delete sx={{ color: '#ef4444' }} />
-                  <Box>
-                    <Typography sx={{ fontWeight: 500 }}>
-                      Excluir Curso
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Remova permanentemente este curso
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
-        </Box>
+          <Item 
+            icon="fa-globe" 
+            label="Curso Público"
+            rightElement={renderSwitch()}
+          />
+           <Item 
+            icon="fa-dollar-sign" 
+            label="Monetização"
+            rightElement={renderSwitch()}
+          />
+        </div>
 
-      </Container>
-    </ThemeProvider>
+        {/* ZONA DE PERIGO */}
+        <div className="delete-container">
+          <button className="delete-btn">
+            <i className="fas fa-trash-alt"></i>
+            Excluir Curso
+          </button>
+        </div>
+
+      </main>
+    </div>
   );
 };
-
-export default ConfiguracoesCurso;
