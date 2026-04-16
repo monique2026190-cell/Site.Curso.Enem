@@ -17,11 +17,12 @@ const CriarProposta: React.FC = () => {
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [capa_curso, setCapaCurso] = useState('');
+  const [preco, setPreco] = useState('');
   const { salvarCurso, loading, error } = useCriarCurso(); // Usando o hook
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    await salvarCurso({ nome, descricao, capa_curso });
+    await salvarCurso({ nome, descricao, capa_curso, preco: parseFloat(preco) });
   };
 
   return (
@@ -75,6 +76,22 @@ const CriarProposta: React.FC = () => {
             name="capa_curso"
             value={capa_curso}
             onChange={(e) => setCapaCurso(e.target.value)}
+            variant="outlined"
+            InputLabelProps={{
+              style: { color: '#E0E0E0' },
+            }}
+            sx={{ input: { color: 'white' }, '.MuiOutlinedInput-root': { '.MuiOutlinedInput-notchedOutline': { borderColor: 'gray' } } }}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="preco"
+            label="Preço"
+            name="preco"
+            type="number"
+            value={preco}
+            onChange={(e) => setPreco(e.target.value)}
             variant="outlined"
             InputLabelProps={{
               style: { color: '#E0E0E0' },

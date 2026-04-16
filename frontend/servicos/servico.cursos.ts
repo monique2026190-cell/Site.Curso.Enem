@@ -9,11 +9,21 @@ export const buscarCursos = () => {
 };
 
 /**
+ * Busca um curso pelo seu ID.
+ * @param id O ID do curso a ser buscado.
+ * @returns A resposta da API com os dados do curso.
+ */
+export const buscarCursoPorId = (id: string) => {
+  return api.get(`/api/cursos/${id}`);
+};
+
+
+/**
  * Cria um novo curso.
  * @param curso Os dados do curso a ser criado.
  * @returns A resposta da API.
  */
-export const criarCurso = (curso: { nome: string; descricao: string; capa_curso: string; usuario_id: number }) => {
+export const criarCurso = (curso: { nome: string; descricao: string; capa_curso: string; preco: number; usuario_id: number }) => {
   return api.post('/api/cursos', curso);
 };
 

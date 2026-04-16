@@ -1,4 +1,4 @@
-import { buscarTodosCursos, inserirCurso, apagarCursoRepo, } from '../repository/repositorio.cursos.js';
+import { buscarTodosCursos, buscarCursoPorIdRepo, inserirCurso, apagarCursoRepo, } from '../repository/repositorio.cursos.js';
 import { logger } from '../logs/logger.js';
 /**
  * Lida com a requisição para buscar todos os cursos.
@@ -14,12 +14,31 @@ export const getCursos = async (req, res) => {
     }
 };
 /**
+ * Lida com a requisição para buscar um curso por ID.
+ */
+export const getCursoPorId = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const curso = await buscarCursoPorIdRepo(Number(id));
+        if (curso) {
+            res.json(curso);
+        }
+        else {
+            res.status(404).json({ message: 'Curso não encontrado' });
+        }
+    }
+    catch (error) {
+        logger.error({ error }, 'Erro ao buscar curso por ID');
+        res.status(500).json({ message: 'Erro interno no servidor' });
+    }
+};
+/**
  * Lida com a requisição para criar um novo curso.
  */
 export const criarCurso = async (req, res) => {
     try {
-        const { nome, descricao, capa_curso, usuario_id } = req.body;
-        const novoCurso = await inserirCurso({ nome, descricao, capa_curso, usuario_id });
+        const { nome, descricao, capa_curso, preco, usuario_id } = req.body;
+        const novoCurso = await inserirCurso({ nome, descricao, capa_curso, preco, usuario_id });
         res.status(201).json(novoCurso);
     }
     catch (error) {

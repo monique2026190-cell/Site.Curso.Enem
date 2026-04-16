@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Card, CardContent, Typography, Container, Button, CardMedia, CssBaseline, GlobalStyles } from '@mui/material';
+import { Card, CardContent, Typography, Container, Button, CardMedia, CssBaseline, GlobalStyles, CircularProgress } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CardMetodosPagamento from '../componentes/card.metodos.pagamento';
 import Cabecalho from '../componentes/Cabecalho';
 import DescricaoCursoCard from '../componentes/DescricaoCursoCard';
 import ComentariosCard from '../componentes/ComentariosCard';
+import { useDetalhesCurso } from '../hooks/useDetalhesCurso';
 
 const darkTheme = createTheme({
   palette: {
@@ -19,15 +20,8 @@ const darkTheme = createTheme({
 
 const DetalhesCurso: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { curso, loading, error } = useDetalhesCurso(id);
   const [open, setOpen] = useState(false);
-
-  const curso = {
-    id: id,
-    nome: `Curso de ${id}`,
-    descricao: `Descrição detalhada do curso de ${id}.`,
-    preco: 'R$ 49,99',
-    imagem: 'https://via.placeholder.com/300'
-  };
 
   const comentarios = [
     { user: 'Alice', text: 'Ótimo curso, aprendi muito!' },
@@ -42,6 +36,18 @@ const DetalhesCurso: React.FC = () => {
     setOpen(false);
   };
 
+  if (loading) {
+    return <CircularProgress />;
+  }
+
+  if (error) {
+    return <Typography>Erro ao carregar o curso.</Typography>;
+  }
+
+  if (!curso) {
+    return <Typography>Curso não encontrado.</Typography>;
+  }
+
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
@@ -52,7 +58,7 @@ const DetalhesCurso: React.FC = () => {
           <CardMedia
             component="img"
             height="300"
-            image={curso.imagem}
+            image={curso.capa_curso}
             alt={`Imagem do ${curso.nome}`}
           />
           <CardContent>

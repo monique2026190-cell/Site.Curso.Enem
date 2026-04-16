@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCursos, criarCurso, apagarCurso } from '../controllers/controlador.cursos.js';
+import { getCursos, getCursoPorId, criarCurso, apagarCurso } from '../controllers/controlador.cursos.js';
 import { authMiddleware } from '../middleware/middleware.autenticacao.js';
 const router = Router();
 /**
@@ -12,6 +12,16 @@ const router = Router();
  *         description: Lista de cursos
  */
 router.get('/cursos', authMiddleware, getCursos);
+/**
+ * @swagger
+ * /api/cursos/{id}:
+ *   get:
+ *     summary: Retorna um curso pelo ID
+ *     responses:
+ *       200:
+ *         description: Dados do curso
+ */
+router.get('/cursos/:id', authMiddleware, getCursoPorId);
 /**
  * @swagger
  * /api/cursos:

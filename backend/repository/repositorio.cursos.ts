@@ -1,6 +1,7 @@
 import pool from '../db/pool.js';
 import {
   buscarCursosQuery,
+  buscarCursoPorIdQuery,
   inserirCursoQuery,
   apagarCursoQuery
 } from '../db/queries/cursos.queries.js';
@@ -23,15 +24,32 @@ export const buscarTodosCursos = async () => {
 };
 
 /**
+ * Busca um curso pelo seu ID no banco de dados.
+ */
+export const buscarCursoPorIdRepo = async (id: number) => {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(buscarCursoPorIdQuery, [id]);
+    return result.rows[0];
+  } catch (error) {
+    logger.error({ error }, 'Erro ao buscar curso por ID no banco de dados');
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+/**
  * Insere um novo curso no banco de dados.
  */
-export const inserirCurso = async (curso: { nome: string; descricao: string; capa_curso: string; usuario_id: number }) => {
+export const inserirCurso = async (curso: { nome: string; descricao: string; capa_curso: string; preco: number; usuario_id: number }) => {
   const client = await pool.connect();
   try {
     const result = await client.query(inserirCursoQuery, [
       curso.nome,
       curso.descricao,
       curso.capa_curso,
+      curso.preco,
       curso.usuario_id,
     ]);
     return result.rows[0];

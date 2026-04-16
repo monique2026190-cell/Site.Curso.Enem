@@ -7,6 +7,7 @@ interface CursoData {
   nome: string;
   descricao: string;
   capa_curso: string;
+  preco: number;
 }
 
 export const useCriarCurso = () => {
