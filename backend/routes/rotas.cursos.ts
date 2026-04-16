@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCursos, criarCurso } from '../controllers/controlador.cursos.js';
+import { getCursos, criarCurso, apagarCurso } from '../controllers/controlador.cursos.js';
 import { authMiddleware } from '../middleware/middleware.autenticacao.js';
 
 const router = Router();
@@ -25,5 +25,16 @@ router.get('/cursos', authMiddleware, getCursos);
  *         description: Curso criado com sucesso
  */
 router.post('/cursos', authMiddleware, criarCurso);
+
+/**
+ * @swagger
+ * /api/cursos/{id}:
+ *   delete:
+ *     summary: Apaga um curso pelo ID
+ *     responses:
+ *       204:
+ *         description: Curso apagado com sucesso
+ */
+router.delete('/cursos/:id', authMiddleware, apagarCurso);
 
 export default router;

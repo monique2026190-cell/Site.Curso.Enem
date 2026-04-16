@@ -7,7 +7,7 @@ import api from '../servicos/api';
 
 // Tipagem forte para o usuário
 type User = {
-  id: string;
+  id: any;
   email: string;
   nome?: string;
   foto_perfil?: string;
@@ -22,7 +22,7 @@ interface AuthState {
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthState | undefined>(undefined);
+export const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

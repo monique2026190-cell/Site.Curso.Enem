@@ -18,6 +18,10 @@ CREATE TABLE cursos (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     descricao TEXT NOT NULL,
-    preco NUMERIC(10, 2) NOT NULL,
-    criado_em TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    preco NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
+    capa_curso TEXT, -- URL da imagem de capa do curso
+    usuario_id INTEGER NOT NULL, -- Chave estrangeira para a tabela de usuários
+    criado_em TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );

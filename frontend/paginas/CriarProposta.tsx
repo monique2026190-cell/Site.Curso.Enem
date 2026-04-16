@@ -16,11 +16,12 @@ const darkTheme = createTheme({
 const CriarProposta: React.FC = () => {
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
+  const [capa_curso, setCapaCurso] = useState('');
   const { salvarCurso, loading, error } = useCriarCurso(); // Usando o hook
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    await salvarCurso({ nome, descricao });
+    await salvarCurso({ nome, descricao, capa_curso });
   };
 
   return (
@@ -64,6 +65,21 @@ const CriarProposta: React.FC = () => {
               style: { color: '#E0E0E0' },
             }}
             sx={{ textarea: { color: 'white' }, '.MuiOutlinedInput-root': { '.MuiOutlinedInput-notchedOutline': { borderColor: 'gray' } } }}
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="capa_curso"
+            label="URL da Capa do Curso"
+            name="capa_curso"
+            value={capa_curso}
+            onChange={(e) => setCapaCurso(e.target.value)}
+            variant="outlined"
+            InputLabelProps={{
+              style: { color: '#E0E0E0' },
+            }}
+            sx={{ input: { color: 'white' }, '.MuiOutlinedInput-root': { '.MuiOutlinedInput-notchedOutline': { borderColor: 'gray' } } }}
           />
 
           {error && (
