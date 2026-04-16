@@ -22,14 +22,6 @@ if (!appConfig.googleClientId) {
     console.error("[App Config] ERRO: A variável de ambiente GOOGLE_CLIENT_ID não foi definida.");
     process.exit(1); // Encerra a aplicação se a variável não estiver presente
 }
-if (!appConfig.stripeSecretKey) {
-    console.error("[App Config] ERRO: A variável de ambiente STRIPE_SECRET_KEY não foi definida.");
-    process.exit(1);
-}
-if (!appConfig.stripeWebhookSecret) {
-    console.error("[App Config] ERRO: A variável de ambiente STRIPE_WEBHOOK_SECRET não foi definida.");
-    process.exit(1);
-}
 if (!appConfig.frontendUrl) {
     console.error("[App Config] ERRO: A variável de ambiente FRONTEND_URL não foi definida.");
     process.exit(1);
