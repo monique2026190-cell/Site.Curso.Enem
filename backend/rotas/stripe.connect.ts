@@ -1,9 +1,9 @@
 
 import express from 'express';
 import Stripe from 'stripe';
-import { appConfig } from '../config';
-import { authMiddleware } from '../middleware/middleware.autenticacao'; 
-import pool from '../db/pool';
+import { appConfig } from '../config.js';
+import { authMiddleware } from '../middleware/middleware.autenticacao.js'; 
+import pool from '../db/pool.js';
 
 const router = express.Router();
 
