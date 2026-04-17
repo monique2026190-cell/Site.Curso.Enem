@@ -1,7 +1,7 @@
 
 import pool from '../db/pool.js';
 import { logger } from '../logs/logger.js';
-import { findUserByGoogleIdQuery, createUserQuery, updateUserProfileQuery } from '../db/queries/usuario.queries.js';
+import { findUserByGoogleIdQuery, createUserQuery, updateUserProfileQuery, findUserByIdQuery } from '../db/queries/usuario.queries.js';
 
 interface GoogleUser {
   sub: string;
@@ -18,6 +18,22 @@ interface AppUser {
   foto_perfil?: string;
   perfil_completo: boolean;
 }
+
+export const findUserById = async (userId: string): Promise<AppUser | null> => {
+  const client = await pool.connect();
+  try {
+    const result = await client.query(findUserByIdQuery, [userId]);
+    if (result.rows.length > 0) {
+      return result.rows[0];
+    }
+    return null;
+  } catch (error) {
+    logger.error({ error, userId }, 'Error in findUserById');
+    throw error;
+  } finally {
+    client.release();
+  }
+};
 
 export const findOrCreateUser = async (googleUser: GoogleUser): Promise<AppUser> => {
   const client = await pool.connect();

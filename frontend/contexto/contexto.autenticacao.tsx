@@ -1,12 +1,12 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logger } from '../logs/app.log';
+import { logger } from '../utils/logger';
 import { loginComGoogle } from '../servicos/servico.autenticacao';
 import api from '../servicos/api';
 
 type User = {
-  id: any;
+  id: string;
   email: string;
   nome?: string;
   foto_perfil?: string;
@@ -16,8 +16,10 @@ interface AuthState {
   token: string | null;
   user: User | null;
   loading: boolean;
+  loginLoading: boolean;
   login: (credential: string) => Promise<void>;
   logout: () => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 export const AuthContext = createContext<AuthState | undefined>(undefined);
@@ -34,45 +36,56 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loginLoading, setLoginLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const restaurarSessao = async () => {
-      console.log("Restaurando sessão...");
+      logger.info('auth.session.restore.start');
       const storedToken = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
-      console.log("Token do localStorage:", storedToken);
-      console.log("Usuário do localStorage:", storedUser);
 
-      if (storedToken && storedUser) {
-        logger.info('auth.session.restore.attempt', { hasToken: true, hasUser: true });
+      if (storedToken) {
+        logger.info('auth.session.restore.token_found');
         api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
-        setToken(storedToken);
-        setUser(JSON.parse(storedUser));
-        console.log("Sessão restaurada:", { token: storedToken, user: JSON.parse(storedUser) });
+
+        try {
+          const { data: userFromApi } = await api.get('/auth/me');
+          setToken(storedToken);
+          setUser(userFromApi);
+          localStorage.setItem('user', JSON.stringify(userFromApi)); // Atualiza o usuário no localStorage
+          logger.info('auth.session.restore.success', { userId: userFromApi.id });
+        } catch (error: any) {
+          logger.error('auth.session.restore.token_invalid', { error: error.response?.data?.message || error.message });
+          setToken(null);
+          setUser(null);
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          delete api.defaults.headers.common['Authorization'];
+        }
+
       } else {
-        logger.info('auth.session.restore.no_data', { hasToken: !!storedToken, hasUser: !!storedUser });
-        console.log("Nenhum dado de sessão encontrado.");
+        logger.info('auth.session.restore.no_token');
       }
       setLoading(false);
-      console.log("Restauração da sessão concluída. Loading:", false);
+      logger.info('auth.session.restore.finish');
     };
 
     restaurarSessao();
   }, []);
 
   const login = async (credential: string) => {
-    setLoading(true);
-    logger.info('auth.login.attempt');
+    setLoginLoading(true);
+    logger.info('auth.login.start');
 
     if (import.meta.env.DEV && credential === 'dummy-token') {
+      logger.info('auth.login.dummy_mode');
       const dummyUser = { id: 'dummy-id', email: 'dev@example.com', nome: 'Dev User' };
       localStorage.setItem('token', 'dummy-token');
       localStorage.setItem('user', JSON.stringify(dummyUser));
       api.defaults.headers.common['Authorization'] = 'Bearer dummy-token';
       setToken('dummy-token');
       setUser(dummyUser);
-      setLoading(false);
+      setLoginLoading(false);
       navigate('/cursos');
       return;
     }
@@ -105,12 +118,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       delete api.defaults.headers.common['Authorization'];
       throw error;
     } finally {
-      setLoading(false);
+      setLoginLoading(false);
     }
   };
 
   const logout = () => {
-    logger.info('auth.logout.success', { userId: user?.id, email: user?.email });
+    logger.info('auth.logout.success', { userId: user?.id });
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
@@ -123,8 +136,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     token,
     user,
     loading,
+    loginLoading,
     login,
     logout,
+    setUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

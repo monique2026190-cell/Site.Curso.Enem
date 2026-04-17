@@ -5,7 +5,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import routes from './routes/rotas.js';
-import { authMiddleware } from './middleware/middleware.autenticacao.js';
+import { verificarAutenticacao } from './middleware/middleware.autenticacao.js';
 import { httpLogger } from './middleware/logger.middleware.js';
 import { logger } from './logs/logger.js';
 import initDB from './db/init.db.js';

@@ -1,38 +1,44 @@
 
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { appConfig } from '../config.js';
+import { findUserById } from '../repository/repositorio.usuario.js';
+import { logger } from '../logs/logger.js';
 
-// Estende a interface Request do Express para incluir a propriedade 'user'
-interface AuthenticatedRequest extends Request {
-  user?: any; // Você pode definir uma interface mais específica para o usuário aqui
-}
-
-/**
- * Middleware para verificar a autenticidade de um token JWT.
- * O token deve ser fornecido no cabeçalho 'Authorization' como 'Bearer [token]'.
- */
-export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const verificarAutenticacao = async (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Token de autorização não fornecido ou mal formatado.' });
+    return res.status(401).json({ message: 'Token de autenticação não fornecido ou mal formatado.' });
   }
 
   const token = authHeader.split(' ')[1];
 
   try {
-    const decoded = jwt.verify(token, appConfig.JWT_SECRET);
-    req.user = decoded; // Anexa os dados do usuário decodificados à requisição
-    next(); // Continua para a próxima função de middleware ou para a rota
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string, email: string };
+
+    const user = await findUserById(decoded.userId);
+
+    if (!user) {
+      logger.warn({ userId: decoded.userId }, 'User not found for token.');
+      return res.status(404).json({ message: 'Usuário não encontrado.' });
+    }
+
+    // Anexa os dados do usuário à requisição para uso posterior
+    // @ts-ignore
+    req.user = {
+      id: user.id,
+      email: user.email,
+      nome: user.nome,
+      foto_perfil: user.foto_perfil,
+      perfilCompleto: user.perfil_completo
+    };
+    
+    next();
   } catch (error) {
+    logger.error({ error }, 'Token verification failed.');
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({ message: 'Token expirado.' });
     }
-    if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(401).json({ message: 'Token inválido.' });
-    }
-    // Para outros erros inesperados
-    return res.status(500).json({ message: 'Erro interno ao verificar o token.' });
+    return res.status(401).json({ message: 'Token inválido.' });
   }
 };

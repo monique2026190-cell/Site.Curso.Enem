@@ -27,10 +27,8 @@ export const googleLoginHandler = async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid Google token.' });
     }
 
-    // Utiliza a função findOrCreateUser do repositório
     const user = await findOrCreateUser(payload as TokenPayload & { sub: string; email: string; name: string; picture?: string });
 
-    // Cria um JWT para a sessão da aplicação
     const appJwt = jwt.sign(
       { userId: user.id, email: user.email },
       process.env.JWT_SECRET as string,
@@ -52,5 +50,19 @@ export const googleLoginHandler = async (req: Request, res: Response) => {
   } catch (error) {
     logger.error({ error }, 'Error during Google login');
     res.status(500).json({ message: 'Internal server error during Google login.' });
+  }
+};
+
+export const meHandler = (req: Request, res: Response) => {
+  // O middleware verificarAutenticacao já validou o token e anexou os dados do usuário a req.user
+  // @ts-ignore
+  if (req.user) {
+    // @ts-ignore
+    logger.info({ userId: req.user.id }, 'User data requested via /me endpoint.');
+    // @ts-ignore
+    res.status(200).json(req.user);
+  } else {
+    logger.warn('Attempted to access /me without a valid user session.');
+    res.status(404).json({ message: 'User not found.' });
   }
 };

@@ -1,13 +1,22 @@
 
-import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom'; // 1. Importe o Router
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import AppRoutes from './app.routes';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider, useAuth } from './contexto/contexto.autenticacao';
 import { env } from './config/env';
+import { logger } from './utils/logger';
 
 const AppContent: React.FC = () => {
   const { loading } = useAuth();
+
+  useEffect(() => {
+    if (loading) {
+      logger.info('Aplicação carregando...');
+    } else {
+      logger.info('Aplicação pronta');
+    }
+  }, [loading]);
 
   if (loading) {
     return (
@@ -23,9 +32,8 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
   const isGoogleAuthConfigured = env.googleClientId && !env.googleClientId.includes('SEU_GOOGLE_CLIENT_ID');
 
-  // O AuthProvider agora está dentro do Router
   const MainApp = (
-    <Router> 
+    <Router>
       <AuthProvider>
         <AppContent />
       </AuthProvider>
@@ -39,7 +47,9 @@ const App: React.FC = () => {
       </GoogleOAuthProvider>
     );
   } else {
-    console.warn("AVISO: A autenticação do Google não está configurada. Para habilitar, adicione VITE_GOOGLE_CLIENT_ID ao arquivo .env");
+    logger.warn("Autenticação do Google não configurada", {
+      googleClientId: env.googleClientId,
+    });
     return MainApp;
   }
 };
