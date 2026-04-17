@@ -1,3 +1,4 @@
+
 import api from './api';
 
 /**
@@ -15,4 +16,13 @@ export const loginComGoogle = (credential: string) => {
  */
 export const buscarPerfil = () => {
   return api.get('/api/profile');
+};
+
+/**
+ * Atualiza o perfil do usuário.
+ * @param nomeUsuario O novo nome de usuário.
+ * @returns A resposta da API com os dados do usuário atualizado.
+ */
+export const updateUserProfile = (nomeUsuario: string) => {
+  return api.put('/api/profile', { nomeUsuario });
 };

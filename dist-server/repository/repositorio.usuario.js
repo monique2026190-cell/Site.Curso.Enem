@@ -1,22 +1,15 @@
 import pool from '../db/pool.js';
 import { logger } from '../logs/logger.js';
-import { findUserByGoogleIdQuery, createUserQuery } from '../db/queries/usuario.queries.js';
-/**
- * Encontra um usuário pelo ID do Google ou o cria se ele não existir.
- * @param googleUser O perfil do usuário retornado pela verificação do token do Google.
- * @returns O usuário do aplicativo, seja ele encontrado ou recém-criado.
- */
+import { findUserByGoogleIdQuery, createUserQuery, updateUserProfileQuery } from '../db/queries/usuario.queries.js';
 export const findOrCreateUser = async (googleUser) => {
     const client = await pool.connect();
     try {
-        // Verifica se o usuário já existe
         const findUserResult = await client.query(findUserByGoogleIdQuery, [googleUser.sub]);
         if (findUserResult.rows.length > 0) {
             const existingUser = findUserResult.rows[0];
             logger.info({ userId: existingUser.id, email: existingUser.email }, 'User found in database.');
             return existingUser;
         }
-        // Se não existir, cria um novo usuário
         logger.info({ email: googleUser.email }, 'User not found. Creating new user.');
         const createUserValues = [
             googleUser.sub,
@@ -31,7 +24,22 @@ export const findOrCreateUser = async (googleUser) => {
     }
     catch (error) {
         logger.error({ error }, 'Error in findOrCreateUser');
-        // Lança o erro para ser tratado no controlador
+        throw error;
+    }
+    finally {
+        client.release();
+    }
+};
+export const updateUserProfile = async (userId, nome) => {
+    const client = await pool.connect();
+    try {
+        const values = [nome, userId];
+        const result = await client.query(updateUserProfileQuery, values);
+        logger.info({ userId, nome }, 'User profile updated successfully.');
+        return result.rows[0];
+    }
+    catch (error) {
+        logger.error({ error, userId, nome }, 'Error updating user profile');
         throw error;
     }
     finally {

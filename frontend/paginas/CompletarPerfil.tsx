@@ -1,8 +1,10 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, TextField, Button, Typography, Container, Avatar, CssBaseline, GlobalStyles } from '@mui/material';
 import { Person } from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { updateUserProfile } from '../servicos/servico.autenticacao';
 
 const darkTheme = createTheme({
   palette: {
@@ -16,10 +18,16 @@ const darkTheme = createTheme({
 
 const CompletarPerfil: React.FC = () => {
   const navigate = useNavigate();
+  const [nomeUsuario, setNomeUsuario] = useState('');
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/cursos');
+    try {
+      await updateUserProfile(nomeUsuario);
+      navigate('/cursos');
+    } catch (error) {
+      console.error('Erro ao atualizar o perfil', error);
+    }
   };
 
   return (
@@ -44,6 +52,8 @@ const CompletarPerfil: React.FC = () => {
                 label="Nome de Usuário"
                 name="nomeUsuario"
                 autoFocus
+                value={nomeUsuario}
+                onChange={(e) => setNomeUsuario(e.target.value)}
               />
               <Button
                 type="submit"
