@@ -11,17 +11,15 @@ const AppContent: React.FC = () => {
   const { loading } = useAuth();
 
   useEffect(() => {
-    if (loading) {
-      logger.info('Aplicação carregando...');
-    } else {
-      logger.info('Aplicação pronta');
+    if (!loading) {
+      logger.info('FRONTEND', 'SISTEMA', 'Aplicação pronta');
     }
   }, [loading]);
 
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        Carregando aplicaçāo...
+        Carregando aplicação...
       </div>
     );
   }
@@ -47,7 +45,7 @@ const App: React.FC = () => {
       </GoogleOAuthProvider>
     );
   } else {
-    logger.warn("Autenticação do Google não configurada", {
+    logger.warn('FRONTEND', 'AUTH', 'Autenticação do Google não configurada. A VITE_GOOGLE_CLIENT_ID não está definida no .env.', {
       googleClientId: env.googleClientId,
     });
     return MainApp;

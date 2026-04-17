@@ -5,6 +5,7 @@ import { Container, Typography, Box, Paper, CssBaseline, GlobalStyles, TextField
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useAuth } from '../contexto/contexto.autenticacao';
 import { env } from '../config/env';
+import { logger } from '../utils/logger'; // Importando o logger
 
 const darkTheme = createTheme({
   palette: {
@@ -33,7 +34,8 @@ const Login: React.FC = () => {
   };
 
   const handleGoogleError = () => {
-    console.error('Login com Google falhou');
+    // Substituindo console.error pelo logger hierárquico
+    logger.error('FRONTEND', 'AUTH', 'Login com Google falhou.');
   };
 
   const handleEmailPasswordLogin = (event: React.FormEvent) => {

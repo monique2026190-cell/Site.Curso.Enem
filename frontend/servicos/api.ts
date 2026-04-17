@@ -1,59 +1,60 @@
-import axios, { AxiosResponse } from 'axios';
-import { logger } from '../logs/app.log';
-import { env } from '../config/env';
-import { isValidResponse } from '../utils/apiResponse';
 
-// Cria a instância do Axios com a URL base da API
+import axios, { AxiosResponse, AxiosError } from 'axios';
+import { logger } from '../utils/logger';
+import { env } from '../config/env';
+
 const api = axios.create({
   baseURL: env.apiUrl,
 });
 
-// Adiciona o interceptor de resposta para validar e logar automaticamente
-api.interceptors.response.use(
-  // --- Interceptor de Sucesso ---
-  (response: AxiosResponse) => {
-    // Valida se a resposta, mesmo que bem-sucedida (status 2xx), tem um corpo de dados válido.
-    if (!isValidResponse(response)) {
-      // Se a resposta for inválida (ex: data: null), rejeita a promise.
-      // Isso força o erro a ser tratado no bloco .catch() da chamada da API.
-      logger.error('api.invalid.response', {
-        url: response.config?.url,
-        status: response.status,
-        data: response.data,
-      });
-      // Rejeita a promise com um erro padronizado
-      return Promise.reject(new Error('Resposta da API inválida ou vazia.'));
-    }
+// Interceptor de Requisição: Loga toda requisição que sai da aplicação
+api.interceptors.request.use(
+  (config) => {
+    const { method, url } = config;
+    // Log da requisição com o novo formato hierárquico
+    logger.info('API', 'HTTP', `Requisição: ${method?.toUpperCase()} ${url}`);
+    return config;
+  },
+  (error) => {
+    logger.error('API', 'HTTP', 'Erro ao preparar a requisição', { error });
+    return Promise.reject(error);
+  }
+);
 
-    // Se a resposta for válida, apenas a repassa.
+// Interceptor de Resposta: Loga toda resposta (sucesso ou erro)
+api.interceptors.response.use(
+  // --- Handler de Sucesso ---
+  (response: AxiosResponse) => {
+    const { status } = response;
+    const { method, url } = response.config;
+    // Log da resposta de sucesso com o novo formato
+    logger.info('API', 'HTTP', `Sucesso: ${method?.toUpperCase()} ${url} | ${status}`);
     return response;
   },
 
-  // --- Interceptor de Erro ---
-  (error) => {
-    // Verifica se o erro é uma resposta de erro do Axios (status 4xx, 5xx)
+  // --- Handler de Erro ---
+  (error: AxiosError) => {
     if (error.response) {
-      logger.error('api.error', {
-        url: error.config?.url,
-        status: error.response?.status,
-        data: error.response?.data,
-        method: error.config?.method,
+      // Erro com resposta do servidor (4xx, 5xx)
+      const { status, data } = error.response;
+      const { method, url } = error.config || {};
+      logger.error('API', 'HTTP', `Erro: ${method?.toUpperCase()} ${url} | ${status}`, {
+        status,
+        resposta: data,
       });
     } else if (error.request) {
-      // O erro ocorreu na requisição (ex: sem resposta do servidor)
-      logger.error('api.request.error', {
-        message: 'Nenhuma resposta recebida do servidor.',
-        url: error.config?.url,
-        method: error.config?.method,
+      // Erro na requisição (sem resposta, timeout)
+      const { method, url } = error.config || {};
+      logger.warn('API', 'HTTP', `Sem Resposta: ${method?.toUpperCase()} ${url}`, {
+        detalhes: 'Nenhuma resposta recebida do servidor.',
       });
     } else {
-      // O erro ocorreu ao configurar a requisição
-      logger.error('api.config.error', {
-        message: error.message,
+      // Erro na configuração da requisição
+      logger.error('API', 'HTTP', 'Erro de Configuração', {
+        mensagem: error.message,
       });
     }
 
-    // Rejeita a promise para que o erro possa ser tratado pelo código que fez a chamada
     return Promise.reject(error);
   }
 );

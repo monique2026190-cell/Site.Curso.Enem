@@ -1,7 +1,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { logger } from '../utils/logger';
+import { logger, Contexto, Categoria } from '../utils/logger'; // Importando o novo logger
 import { loginComGoogle } from '../servicos/servico.autenticacao';
 import api from '../servicos/api';
 
@@ -41,21 +41,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     const restaurarSessao = async () => {
-      logger.info('auth.session.restore.start');
+      logger.info('FRONTEND', 'AUTH', 'Tentando restaurar sessão...');
       const storedToken = localStorage.getItem('token');
 
       if (storedToken) {
-        logger.info('auth.session.restore.token_found');
+        logger.info('FRONTEND', 'AUTH', 'Token encontrado no localStorage.');
         api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
 
         try {
           const { data: userFromApi } = await api.get('/auth/me');
           setToken(storedToken);
           setUser(userFromApi);
-          localStorage.setItem('user', JSON.stringify(userFromApi)); // Atualiza o usuário no localStorage
-          logger.info('auth.session.restore.success', { userId: userFromApi.id });
+          localStorage.setItem('user', JSON.stringify(userFromApi));
+          logger.info('FRONTEND', 'AUTH', `Sessão restaurada para ${userFromApi.email}`);
         } catch (error: any) {
-          logger.error('auth.session.restore.token_invalid', { error: error.response?.data?.message || error.message });
+          logger.error('FRONTEND', 'AUTH', 'Token inválido ou expirado.', { error: error.response?.data?.message || error.message });
           setToken(null);
           setUser(null);
           localStorage.removeItem('token');
@@ -64,10 +64,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
 
       } else {
-        logger.info('auth.session.restore.no_token');
+        logger.info('FRONTEND', 'AUTH', 'Nenhum token encontrado para restaurar.');
       }
       setLoading(false);
-      logger.info('auth.session.restore.finish');
     };
 
     restaurarSessao();
@@ -75,10 +74,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const login = async (credential: string) => {
     setLoginLoading(true);
-    logger.info('auth.login.start');
+    logger.info('FRONTEND', 'AUTH', 'Tentativa de login iniciada.');
 
     if (import.meta.env.DEV && credential === 'dummy-token') {
-      logger.info('auth.login.dummy_mode');
+      logger.info('FRONTEND', 'AUTH', 'Usando modo de desenvolvimento (dummy token).');
       const dummyUser = { id: 'dummy-id', email: 'dev@example.com', nome: 'Dev User' };
       localStorage.setItem('token', 'dummy-token');
       localStorage.setItem('user', JSON.stringify(dummyUser));
@@ -101,7 +100,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setToken(newToken);
       setUser(loggedInUser);
 
-      logger.info('auth.login.success', { userId: loggedInUser?.id, email: loggedInUser?.email, perfilCompleto });
+      logger.info('FRONTEND', 'AUTH', `Login realizado com sucesso para ${loggedInUser?.email}.`);
 
       if (perfilCompleto) {
         navigate('/cursos');
@@ -110,7 +109,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
     } catch (error: any) {
-      logger.error('auth.login.error', { message: error.message, stack: error.stack });
+      logger.error('FRONTEND', 'AUTH', 'Erro durante o login.', { message: error.message, stack: error.stack });
       setToken(null);
       setUser(null);
       localStorage.removeItem('token');
@@ -123,7 +122,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const logout = () => {
-    logger.info('auth.logout.success', { userId: user?.id });
+    logger.info('FRONTEND', 'AUTH', `Logout realizado para ${user?.email}.`);
     setToken(null);
     setUser(null);
     localStorage.removeItem('token');
