@@ -1,7 +1,7 @@
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { appConfig } from '../config.js';
-const client = new OAuth2Client(appConfig.googleClientId);
+const client = new OAuth2Client(appConfig.GOOGLE_CLIENT_ID);
 /**
  * Verifica o token de ID do Google e extrai as informações do usuário.
  * @param {string} token - O token de ID do Google enviado pelo cliente.
@@ -11,7 +11,7 @@ export async function verifyGoogleToken(token) {
     try {
         const ticket = await client.verifyIdToken({
             idToken: token,
-            audience: appConfig.googleClientId,
+            audience: appConfig.GOOGLE_CLIENT_ID,
         });
         const payload = ticket.getPayload();
         if (payload) {
@@ -36,8 +36,5 @@ export async function verifyGoogleToken(token) {
  * @returns {string} O token JWT assinado.
  */
 export function generateJwt(user) {
-    if (!appConfig.jwtSecret) {
-        throw new Error('O segredo JWT não foi definido nas variáveis de ambiente.');
-    }
-    return jwt.sign(user, appConfig.jwtSecret, { expiresIn: '1h' });
+    return jwt.sign(user, appConfig.JWT_SECRET, { expiresIn: '1h' });
 }

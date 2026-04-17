@@ -1,19 +1,7 @@
+
 import { Request, Response } from 'express';
-import Stripe from 'stripe';
-
-type StripeInstance = InstanceType<typeof Stripe>;
-
-let stripe: StripeInstance | null = null;
-
-// Initialize Stripe only if the secret key is available
-if (process.env.STRIPE_SECRET_KEY) {
-  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2026-03-25.dahlia',
-  });
-  console.log('[Stripe Controller] Stripe SDK initialized.');
-} else {
-  console.warn('[Stripe Controller] STRIPE_SECRET_KEY not found. Stripe disabled.');
-}
+import { getStripe } from '../stripe.js';
+import { appConfig } from '../config.js';
 
 // Simulação de DB (substituir depois)
 const usersDatabase: { [key: string]: { stripeAccountId?: string } } = {
@@ -21,8 +9,10 @@ const usersDatabase: { [key: string]: { stripeAccountId?: string } } = {
 };
 
 const findOrCreateUserAndGetStripeAccountId = async (userId: string) => {
+  const stripe = getStripe();
+  // Esta verificação é uma segurança adicional, embora a rota já deva barrar o acesso.
   if (!stripe) {
-    throw new Error('Stripe is not configured.');
+    throw new Error('Stripe is not configured. This function should not have been called.');
   }
 
   const user = usersDatabase[userId];
@@ -50,8 +40,11 @@ const findOrCreateUserAndGetStripeAccountId = async (userId: string) => {
 };
 
 export const criarSessaoConexao = async (req: Request, res: Response) => {
+  const stripe = getStripe();
+
+  // Feature Toggle: Se o Stripe não estiver configurado no servidor, retorne 503.
   if (!stripe) {
-    return res.status(500).json({ error: 'Stripe is not configured.' });
+    return res.status(503).json({ error: 'Stripe is not enabled on this server' });
   }
 
   try {
@@ -61,8 +54,9 @@ export const criarSessaoConexao = async (req: Request, res: Response) => {
 
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
-      refresh_url: process.env.STRIPE_REFRESH_URL!,
-      return_url: process.env.STRIPE_RETURN_URL!,
+      // Usando a URL do frontend a partir da configuração centralizada
+      refresh_url: `${appConfig.FRONTEND_URL}/stripe/reauth`,
+      return_url: `${appConfig.FRONTEND_URL}/painel-vendedor?stripe_return=true`,
       type: 'account_onboarding',
     });
 

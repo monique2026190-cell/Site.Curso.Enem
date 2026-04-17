@@ -1,22 +1,14 @@
-import Stripe from 'stripe';
-let stripe = null;
-// Initialize Stripe only if the secret key is available
-if (process.env.STRIPE_SECRET_KEY) {
-    stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-        apiVersion: '2026-03-25.dahlia',
-    });
-    console.log('[Stripe Controller] Stripe SDK initialized.');
-}
-else {
-    console.warn('[Stripe Controller] STRIPE_SECRET_KEY not found. Stripe disabled.');
-}
+import { getStripe } from '../stripe.js';
+import { appConfig } from '../config.js';
 // Simulação de DB (substituir depois)
 const usersDatabase = {
     'user_123': {},
 };
 const findOrCreateUserAndGetStripeAccountId = async (userId) => {
+    const stripe = getStripe();
+    // Esta verificação é uma segurança adicional, embora a rota já deva barrar o acesso.
     if (!stripe) {
-        throw new Error('Stripe is not configured.');
+        throw new Error('Stripe is not configured. This function should not have been called.');
     }
     const user = usersDatabase[userId];
     if (!user)
@@ -38,16 +30,19 @@ const findOrCreateUserAndGetStripeAccountId = async (userId) => {
     return account.id;
 };
 export const criarSessaoConexao = async (req, res) => {
+    const stripe = getStripe();
+    // Feature Toggle: Se o Stripe não estiver configurado no servidor, retorne 503.
     if (!stripe) {
-        return res.status(500).json({ error: 'Stripe is not configured.' });
+        return res.status(503).json({ error: 'Stripe is not enabled on this server' });
     }
     try {
         const userId = 'user_123';
         const accountId = await findOrCreateUserAndGetStripeAccountId(userId);
         const accountLink = await stripe.accountLinks.create({
             account: accountId,
-            refresh_url: process.env.STRIPE_REFRESH_URL,
-            return_url: process.env.STRIPE_RETURN_URL,
+            // Usando a URL do frontend a partir da configuração centralizada
+            refresh_url: `${appConfig.FRONTEND_URL}/stripe/reauth`,
+            return_url: `${appConfig.FRONTEND_URL}/painel-vendedor?stripe_return=true`,
             type: 'account_onboarding',
         });
         res.json({ url: accountLink.url });

@@ -1,28 +1,56 @@
 import dotenv from 'dotenv';
-// Carrega as variáveis de ambiente do arquivo .env (se existir) para process.env
-// Em um ambiente de produção (como o seu serviço de hospedagem), 
-// as variáveis serão injetadas diretamente no ambiente do processo.
 dotenv.config();
-/**
- * Objeto de configuração que exporta as variáveis de ambiente necessárias para a aplicação.
- * Isso centraliza o acesso e a validação das configurações.
- */
-export const appConfig = {
-    googleClientId: process.env.GOOGLE_CLIENT_ID,
-    googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    jwtSecret: process.env.JWT_SECRET,
-    databaseUrl: process.env.DATABASE_URL,
-    stripeSecretKey: process.env.STRIPE_SECRET_KEY,
-    stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
-    frontendUrl: process.env.FRONTEND_URL,
+// ================================
+// HELPERS
+// ================================
+const getEnv = (key, required = true) => {
+    const value = process.env[key];
+    if (required && !value) {
+        // Este erro é mais específico e útil para o debug
+        throw new Error(`❌ ERRO CRÍTICO: A variável de ambiente obrigatória '${key}' não foi definida.`);
+    }
+    return value;
 };
-// --- Validação de Variáveis Críticas ---
-// Garante que a aplicação não inicie sem as configurações essenciais.
-if (!appConfig.googleClientId) {
-    console.error("[App Config] ERRO: A variável de ambiente GOOGLE_CLIENT_ID não foi definida.");
-    process.exit(1); // Encerra a aplicação se a variável não estiver presente
+// ================================
+// REQUIRED CONFIG
+// ================================
+let requiredEnv;
+try {
+    requiredEnv = {
+        GOOGLE_CLIENT_ID: getEnv('GOOGLE_CLIENT_ID'),
+        GOOGLE_CLIENT_SECRET: getEnv('GOOGLE_CLIENT_SECRET'),
+        JWT_SECRET: getEnv('JWT_SECRET'),
+        DATABASE_URL: getEnv('DATABASE_URL'),
+        FRONTEND_URL: getEnv('FRONTEND_URL'),
+    };
 }
-if (!appConfig.frontendUrl) {
-    console.error("[App Config] ERRO: A variável de ambiente FRONTEND_URL não foi definida.");
+catch (error) {
+    console.error(error.message);
+    // Encerra a aplicação se uma variável obrigatória estiver faltando
     process.exit(1);
 }
+// ================================
+// OPTIONAL: STRIPE
+// ================================
+const getStripeConfig = () => {
+    const secretKey = process.env.STRIPE_SECRET_KEY;
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!secretKey) {
+        console.warn('⚠️  [App Config] Stripe está INATIVO (STRIPE_SECRET_KEY não encontrada).');
+        return null;
+    }
+    console.log('✅ [App Config] Stripe está ATIVO.');
+    return {
+        secretKey,
+        webhookSecret,
+    };
+};
+// ================================
+// FINAL CONFIG
+// ================================
+export const appConfig = {
+    ...requiredEnv,
+    services: {
+        stripe: getStripeConfig(),
+    },
+};

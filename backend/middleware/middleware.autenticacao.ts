@@ -22,10 +22,7 @@ export const authMiddleware = (req: AuthenticatedRequest, res: Response, next: N
   const token = authHeader.split(' ')[1];
 
   try {
-    if (!appConfig.jwtSecret) {
-      throw new Error('O segredo JWT não está configurado no servidor.');
-    }
-    const decoded = jwt.verify(token, appConfig.jwtSecret);
+    const decoded = jwt.verify(token, appConfig.JWT_SECRET);
     req.user = decoded; // Anexa os dados do usuário decodificados à requisição
     next(); // Continua para a próxima função de middleware ou para a rota
   } catch (error) {
